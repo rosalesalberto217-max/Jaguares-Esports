@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Armería S5A | Tactical Interface</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --verde-jaguar: #39ff14;
+            --naranja-jaguar: #ff6600;
+            --rojo-alerta: #ff003c;
+            --bg-dark: #050505;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #050505 100%);
+        }
+
+        /* --- NAVEGACIÓN --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 5%; background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(15px); border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+            position: sticky; top: 0; z-index: 1000;
+        }
+
+        .nav-links { display: flex; list-style: none; gap: 30px; }
+        .nav-links a {
+            text-decoration: none; color: #fff; font-family: 'Orbitron';
+            font-size: 0.7rem; letter-spacing: 2px; transition: 0.3s;
+        }
+        .nav-links a:hover { color: var(--verde-jaguar); text-shadow: 0 0 10px var(--verde-jaguar); }
+
+        #cart-counter {
+            background: var(--naranja-jaguar); color: #000;
+            padding: 2px 8px; border-radius: 3px; font-weight: bold; margin-left: 5px;
+        }
+
+        /* --- STATUS BAR --- */
+        .system-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5%; border-bottom: 1px solid #111;
+        }
+
+        .led { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 10px; }
+        .led-active { background: var(--verde-jaguar); box-shadow: 0 0 10px var(--verde-jaguar); animation: pulse 2s infinite; }
+        .led-warn { background: var(--rojo-alerta); box-shadow: 0 0 10px var(--rojo-alerta); }
+        
+        @keyframes pulse { 50% { opacity: 0.3; } }
+
+        /* --- GRID & CARDS --- */
+        .grid-tienda {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 25px; padding: 30px 5%;
+        }
+
+        .card-tienda {
+            background: #000; border: 1px solid #1a1a1a;
+            border-radius: 12px; overflow: hidden; transition: 0.4s;
+            position: relative; text-align: center; padding: 15px;
+        }
+
+        .card-tienda:hover {
+            border-color: var(--verde-jaguar);
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(57, 255, 20, 0.1);
+        }
+
+        .card-tienda img { width: 100%; border-radius: 8px; transition: 0.5s; }
+        .card-tienda h3 { font-family: 'Orbitron'; font-size: 0.8rem; margin: 15px 0; letter-spacing: 1px; }
+        .card-tienda .price { color: var(--verde-jaguar); font-family: 'Orbitron'; font-weight: bold; margin-bottom: 15px; }
+
+        .btn-buy {
+            width: 100%; padding: 12px; border: none; font-family: 'Orbitron';
+            font-weight: bold; cursor: pointer; transition: 0.3s;
+            background: #1a1a1a; color: #fff;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+        }
+
+        .card-tienda:hover .btn-buy { background: var(--naranja-jaguar); color: #000; }
+
+        /* --- FILTROS --- */
+        .filter-btn {
+            background: none; border: 1px solid #333; color: #666;
+            padding: 8px 18px; font-family: 'Orbitron'; font-size: 0.65rem;
+            cursor: pointer; transition: 0.3s; margin-right: 10px;
+        }
+        .filter-btn.active { border-color: var(--verde-jaguar); color: var(--verde-jaguar); }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal-content {
+            background: #000; border: 2px solid var(--verde-jaguar);
+            padding: 30px; width: 350px; text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <img src="img/LOGO Jaguares de Chiapas.png" height="45">
+        <ul class="nav-links">
+            <li><a href="index.html">INICIO</a></li>
+            <li><a href="catalogo.html">TIENDA</a></li>
+            <li><a href="carrito.html">CARRITO <span id="cart-counter">0</span></a></li>
+        </ul>
+    </nav>
+
+    <div class="system-bar">
+        <div id="status-box"></div>
+        <div id="logout-btn"></div>
+    </div>
+
+    <div style="padding: 20px 5%; display: flex; justify-content: space-between;">
+        <div>
+            <button class="filter-btn active" onclick="filtrar('todos', this)">TODOS</button>
+            <button class="filter-btn" onclick="filtrar('jersey', this)">JERSEYS</button>
+            <button class="filter-btn" onclick="filtrar('calzado', this)">CALZADO</button>
+        </div>
+        <input type="text" id="buscador" placeholder="BUSCAR ITEM..." style="background:#111; border:1px solid #333; color:#fff; padding:8px 15px; font-family:'Orbitron'; font-size:0.7rem; width:200px;">
+    </div>
+
+    <div class="grid-tienda" id="grid">
+        <div class="card-tienda" data-cat="jersey" data-name="jersey pro home negro"><img src="img/jfcn1.jpg"><h3>JERSEY PRO HOME (N)</h3><div class="price">$1,299</div><button class="btn-buy" onclick="adquirir(this)">ADQUIRIR</button></div>
+        <div class="card-tienda" data-cat="jersey" data-name="jersey pro away verde"><img src="img/jfcv1.jpg"><h3>JERSEY PRO AWAY (V)</h3><div class="price">$1,299</div><button class="btn-buy" onclick="adquirir(this)">ADQUIRIR</button></div>
+        <div class="card-tienda" data-cat="jersey" data-name="jersey pro alter blanco"><img src="img/jfcb1.jpg"><h3>JERSEY PRO ALTER (B)</h3><div class="price">$1,299</div><button class="btn-buy" onclick="adquirir(this)">ADQUIRIR</button></div>
+        
+        <div class="card-tienda" data-cat="calzado" data-name="tachones elite naranja"><img src="img/TA NA.png"><h3>TACHONES ELITE NA</h3><div class="price">$2,450</div><button class="btn-buy" onclick="adquirir(this)">ADQUIRIR</button></div>
+        <div class="card-tienda" data-cat="calzado" data-name="tachones elite verde"><img src="img/TA V.png"><h3>TACHONES ELITE V</h3><div class="price">$2,450</div><button class="btn-buy" onclick="adquirir(this)">ADQUIRIR</button></div>
+        <div class="card-tienda" data-cat="calzado" data-name="tachones street blanco negro"><img src="img/TA BN.png"><h3>TACHONES STREET BN</h3><div class="price">$2,200</div><button class="btn-buy" onclick="adquirir(this)">ADQUIRIR</button></div>
+        
+        <div class="card-tienda" data-cat="jersey" data-name="jersey classic negro"><img src="img/jfc n.jpg"><h3>JERSEY CLASSIC N</h3><div class="price">$899</div><button class="btn-buy" onclick="adquirir(this)">ADQUIRIR</button></div>
+        <div class="card-tienda" data-cat="jersey" data-name="jersey classic verde"><img src="img/jfc v.jpg"><h3>JERSEY CLASSIC V</h3><div class="price">$899</div><button class="btn-buy" onclick="adquirir(this)">ADQUIRIR</button></div>
+        <div class="card-tienda" data-cat="jersey" data-name="jersey classic blanco"><img src="img/jfc b.jpg"><h3>JERSEY CLASSIC B</h3><div class="price">$899</div><button class="btn-buy" onclick="adquirir(this)">ADQUIRIR</button></div>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content" id="modal-box">
+            <h2 id="modal-title" style="font-family:'Orbitron'; margin:0;">SYSTEM</h2>
+            <p id="modal-msg" style="margin:20px 0; color:#ccc;"></p>
+            <button class="btn-buy" id="modal-btn" style="background:var(--verde-jaguar); color:#000;">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <script>
+        const user = localStorage.getItem('jaguar_user');
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+        function renderStatus() {
+            const statusBox = document.getElementById('status-box');
+            const logoutBox = document.getElementById('logout-btn');
+            const counter = document.getElementById('cart-counter');
+
+            counter.innerText = carrito.length;
+            counter.style.display = carrito.length > 0 ? 'inline' : 'none';
+
+            if(user) {
+                statusBox.innerHTML = `<div class="led led-active"></div><span style="color:var(--verde-jaguar); font-family:Orbitron;">OPERATIVO: ${user.toUpperCase()}</span>`;
+                logoutBox.innerHTML = `<button onclick="logout()" style="background:none; border:1px solid #ff0000; color:#ff0000; padding:5px 10px; font-family:Orbitron; cursor:pointer; font-size:0.6rem;">LOGOUT</button>`;
+            } else {
+                statusBox.innerHTML = `<div class="led led-warn"></div><span style="color:var(--rojo-alerta); font-family:Orbitron;">OPERATIVO: INVITADO (SIN CUENTA)</span>`;
+                logoutBox.innerHTML = '';
+            }
+        }
+
+        function adquirir(btn) {
+            const modal = document.getElementById('modal');
+            const box = document.getElementById('modal-box');
+            const mBtn = document.getElementById('modal-btn');
+
+            if(!user) {
+                box.style.borderColor = 'var(--rojo-alerta)';
+                document.getElementById('modal-title').innerText = "ACCESO DENEGADO";
+                document.getElementById('modal-msg').innerText = "REQUIERE REGISTRO PARA ASIGNAR EQUIPO.";
+                mBtn.innerText = "IR A REGISTRO";
+                mBtn.style.background = 'var(--rojo-alerta)';
+                mBtn.style.color = '#fff';
+                mBtn.onclick = () => window.location.href = 'registro.html';
+            } else {
+                const card = btn.closest('.card-tienda');
+                carrito.push({
+                    nombre: card.querySelector('h3').innerText,
+                    precio: card.querySelector('.price').innerText,
+                    imagen: card.querySelector('img').src
+                });
+                localStorage.setItem('carrito', JSON.stringify(carrito));
+                
+                box.style.borderColor = 'var(--verde-jaguar)';
+                document.getElementById('modal-title').innerText = "VINCULADO";
+                document.getElementById('modal-msg').innerText = "ITEM AÑADIDO AL INVENTARIO TÁCTICO.";
+                mBtn.innerText = "CONTINUAR";
+                mBtn.style.background = 'var(--verde-jaguar)';
+                mBtn.style.color = '#000';
+                mBtn.onclick = () => { modal.style.display = 'none'; renderStatus(); };
+            }
+            modal.style.display = 'flex';
+        }
+
+        function logout() { localStorage.removeItem('jaguar_user'); window.location.reload(); }
+
+        function filtrar(cat, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.card-tienda').forEach(c => {
+                c.style.display = (cat === 'todos' || c.dataset.cat === cat) ? "block" : "none";
+            });
+        }
+
+        document.getElementById('buscador').oninput = (e) => {
+            let val = e.target.value.toLowerCase();
+            document.querySelectorAll('.card-tienda').forEach(c => {
+                c.style.display = c.dataset.name.includes(val) ? "block" : "none";
+            });
+        };
+
+        renderStatus();
+    </script>
+</body>
+</html>

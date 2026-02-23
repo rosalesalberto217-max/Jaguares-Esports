@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventario | Jaguares</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .cart-slot { animation: slideIn 0.4s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        
+        /* Modal de Agradecimiento Dinámico */
+        #modal-gracias {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; 
+            backdrop-filter: blur(8px); animation: fadeIn 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <nav><img src="img/LOGO Jaguares de Chiapas.png" class="logo-nav"><ul><li><a href="index.html">INICIO</a></li><li><a href="catalogo.html">TIENDA</a></li><li><a href="carrito.html">CARRITO</a></li></ul></nav>
+
+    <div style="padding:50px 5%; max-width:850px; margin:auto;">
+        <h1 style="font-family:'Orbitron'; color:var(--verde-jaguar); margin-bottom:30px;">INVENTARIO DE OPERATIVO</h1>
+        <div id="cont"></div>
+        <div id="tot-area" style="margin-top:40px; background:#111; padding:30px; border-radius:15px; border-top:3px solid var(--verde-jaguar); display:none;">
+            <h2 id="total" style="font-family:'Orbitron'; font-size:2.5rem; color:var(--verde-jaguar); margin-bottom:20px;">$0.00</h2>
+            <button class="btn-buy" onclick="finalizarCompra()">CONFIRMAR SUMINISTROS</button>
+        </div>
+    </div>
+
+    <div id="modal-gracias">
+        <div style="background:#000; border:2px solid var(--verde-jaguar); padding:50px; border-radius:20px; text-align:center; box-shadow: 0 0 30px var(--verde-jaguar);">
+            <h2 style="font-family:'Orbitron'; color:var(--verde-jaguar); font-size:2rem;">¡GRACIAS POR TU COMPRA!</h2>
+            <p style="margin:20px 0; font-family:'Rajdhani'; font-size:1.2rem;">Tu equipamiento Jaguares S5A está en camino.</p>
+            <button class="btn-buy" onclick="window.location.href='index.html'" style="width:200px;">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <script>
+        function cargar() {
+            let cart = JSON.parse(localStorage.getItem('carrito')) || [];
+            let c = document.getElementById('cont');
+            let a = document.getElementById('tot-area');
+            c.innerHTML = "";
+            if(cart.length == 0) { 
+                c.innerHTML = "<p style='text-align:center; opacity:0.3; font-family:Orbitron;'>NO HAY OBJETOS EN EL INVENTARIO</p>"; 
+                a.style.display="none"; return; 
+            }
+            a.style.display="block";
+            let s = 0;
+            cart.forEach((i, idx) => {
+                s += parseFloat(i.precio.replace('$','').replace(',',''));
+                c.innerHTML += `
+                    <div class="cart-slot">
+                        <div style="display:flex; align-items:center; gap:20px;">
+                            <img src="${i.imagen}" class="cart-img-min">
+                            <div><h3 style="font-family:'Orbitron'; font-size:0.9rem;">${i.nombre}</h3><p style="color:var(--verde-jaguar);">${i.precio}</p></div>
+                        </div>
+                        <button onclick="borrar(${idx})" style="background:none; border:1px solid var(--naranja-jaguar); color:var(--naranja-jaguar); padding:10px; cursor:pointer; font-family:Orbitron; font-size:0.6rem;">ElIMINAR</button>
+                    </div>`;
+            });
+            document.getElementById('total').innerText = `$${s.toLocaleString('es-MX', {minimumFractionDigits: 2})}`;
+        }
+
+        function borrar(idx) {
+            let cart = JSON.parse(localStorage.getItem('carrito'));
+            cart.splice(idx, 1);
+            localStorage.setItem('carrito', JSON.stringify(cart));
+            cargar(); // Refresca y guarda cambios
+        }
+
+        function finalizarCompra() {
+            localStorage.removeItem('carrito');
+            document.getElementById('modal-gracias').style.display = 'flex';
+        }
+
+        cargar();
+    </script>
+</body>
+</html>

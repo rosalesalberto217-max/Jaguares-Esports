@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"><title>Inicio | Jaguares S5A</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav>
+        <img src="img/LOGO Jaguares de Chiapas.png" class="logo-nav">
+        <ul>
+            <li><a href="index.html">INICIO</a></li>
+            <li><a href="registro.html">REGISTRO</a></li>
+            <li><a href="catalogo.html">TIENDA</a></li>
+            <li><a href="nosotros.html">NOSOTROS</a></li>
+            <li><a href="carrito.html">CARRITO</a></li>
+        </ul>
+    </nav>
+    <main style="height: calc(100vh - 80px); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+        <img src="img/LOGO Jaguares de Chiapas.png" style="width: 280px; filter: drop-shadow(0 0 20px var(--verde-jaguar)); margin-bottom: 20px;">
+        <h1 id="bienvenida" style="font-family:'Orbitron'; font-size:4rem;">BIENVENIDO A LA SELVA</h1>
+        <p style="letter-spacing:12px; color:var(--naranja-jaguar); font-weight:bold;">SQUAD S5A</p>
+    </main>
+    <script>
+        const user = localStorage.getItem('jaguar_user');
+        if(user) document.getElementById('bienvenida').innerText = "HOLA, " + user.toUpperCase();
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
+
+:root {
+    --verde-jaguar: #39FF14;
+    --naranja-jaguar: #FF5F1F;
+    --negro-oled: #050505;
+    --glass: rgba(255, 255, 255, 0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+    background-color: var(--negro-oled); 
+    color: white; 
+    font-family: 'Rajdhani', sans-serif;
+    background-image: radial-gradient(circle at center, #111 0%, #050505 100%);
+}
+
+nav {
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1rem 5%;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 2px solid var(--verde-jaguar);
+    position: sticky; top: 0; z-index: 1000;
+}
+.logo-nav { height: 45px; filter: drop-shadow(0 0 5px var(--verde-jaguar)); }
+nav ul { display: flex; list-style: none; gap: 20px; }
+nav ul li a { color: white; text-decoration: none; font-family: 'Orbitron'; font-size: 0.7rem; letter-spacing: 2px; }
+
+/* TIENDA */
+.grid-tienda { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; padding: 20px; }
+.card-tienda { background: #111; border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; text-align: center; }
+.card-tienda img { width: 100%; height: 160px !important; object-fit: contain; margin-bottom: 10px; }
+
+/* CARRITO SLOTS */
+.cart-slot {
+    background: var(--glass); border: 1px solid rgba(57, 255, 20, 0.2);
+    border-radius: 15px; padding: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;
+}
+.cart-img-min { width: 80px !important; height: 80px !important; object-fit: contain; background: #000; border-radius: 8px; border: 1px solid var(--verde-jaguar); }
+
+.btn-buy {
+    width: 100%; padding: 12px; background: var(--naranja-jaguar); color: white; border: none;
+    font-family: 'Orbitron'; cursor: pointer; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+    font-weight: bold; font-size: 0.7rem; transition: 0.3s;
+}
+.btn-buy:hover { background: var(--verde-jaguar); color: #000; }
